@@ -690,6 +690,11 @@ public class TokenStream
     }
 
     //EECE310_TODO: Write requires, assignable, and ensures specs
+    /*@ requires true;
+        assignable cursor, ungetBuffer[*], ungetCursor;
+     	ensures ungetBuffer[\old(ungetCursor)] == c &&
+     			cursor == \old(cursor-1);
+    @*/    
     private void ungetCharIgnoreLineEnd(int c)
     {
         ungetBuffer[ungetCursor++] = c;
@@ -712,6 +717,11 @@ public class TokenStream
      * Returns the offset into the current line.
      */
     //EECE310_TODO: Write requires, assignable, and ensures specs
+    /*@ requires true;
+	    assignable \nothing;
+	 	ensures (lineEndChar >= 0 ==> \result == (sourceCursor - lineStart - 1) ) &&
+	 			(\result == sourceCursor - lineStart || \result == sourceCursor - lineStart - 1);
+	@*/   
     final int getOffset()
     {
         int n = sourceCursor - lineStart;
