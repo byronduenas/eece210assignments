@@ -522,6 +522,12 @@ public class TokenStream
     }
 
     //EECE310_TODO: Write requires, assignable, and ensures specs
+    /*@ requires stringBuffer != null;
+        assignable stringBuffer, stringBuffer[*], stringBufferTop;
+     	ensures ((\old(stringBuffer.length) == \old(stringBufferTop)) ==> (stringBuffer.length == \old(stringBuffer.length*2))) &&
+     			stringBufferTop == \old(stringBufferTop) + 1 &&
+     			stringBuffer[\old(stringBufferTop)] == (char)c;
+    @*/
     private void addToString(int c)
     {
         int N = stringBufferTop;
