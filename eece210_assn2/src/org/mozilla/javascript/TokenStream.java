@@ -106,11 +106,12 @@ public class TokenStream
         else if (s.equals("return")) {
         	id = Id_return;
         }
-        else {
+        else if (s.equals("true")) {
         	id = Id_true;
         }
-
-        if (id == 0) { return Token.EOF; }
+        else {
+        	return Token.EOF;
+        }
         return id;
     }
 
@@ -299,7 +300,7 @@ public class TokenStream
                 this.string = numString;
 
                 double dval;
-                int radix = base-1;
+                int radix = base;
                 // @ assume numString != null;
                 dval = stringToNumber(numString, 0, radix);
 
