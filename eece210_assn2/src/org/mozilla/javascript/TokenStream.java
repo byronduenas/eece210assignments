@@ -779,7 +779,8 @@ public class TokenStream
         }
     }
 
-    //Note: The assignable clause causes the exceptions thrown in Kit.codeBug() and sourceReader.read(..) to cause warnings
+    //EECE310_TODO: Write requires and assignable specs
+    //Note: assignable clause causes the exceptions thrown in Kit.codeBug() and sourceReader.read(..) to cause warnings
     /*@ requires sourceBuffer != null && sourceReader != null;
 		assignable sourceEnd, sourceCursor, lineStart, sourceBuffer;	
 	@*/
