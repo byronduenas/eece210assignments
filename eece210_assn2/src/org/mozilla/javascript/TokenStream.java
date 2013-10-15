@@ -690,7 +690,7 @@ public class TokenStream
     }
 
     //EECE310_TODO: Write requires, assignable, and ensures specs
-    /*@ requires true;
+    /*@ requires ungetBuffer != null;
         assignable cursor, ungetBuffer[*], ungetCursor;
      	ensures ungetBuffer[\old(ungetCursor)] == c &&
      			cursor == \old(cursor-1);
@@ -717,10 +717,12 @@ public class TokenStream
      * Returns the offset into the current line.
      */
     //EECE310_TODO: Write requires, assignable, and ensures specs
-    /*@ requires true;
+    /*@ requires (lineEndChar >= 0 ==> sourceCursor > lineStart) &&
+     			 (lineEndChar < 0 ==> sourceCursor >= lineStart);
 	    assignable \nothing;
-	 	ensures (lineEndChar >= 0 ==> \result == (sourceCursor - lineStart - 1) ) &&
-	 			(\result == sourceCursor - lineStart || \result == sourceCursor - lineStart - 1);
+	 	ensures (lineEndChar >= 0 ==> \result == (sourceCursor - lineStart - 1)) &&
+	 			(lineEndChar < 0 ==> \result == sourceCursor - lineStart) &&
+	 			(\result >= 0);
 	@*/   
     final int getOffset()
     {
@@ -777,8 +779,13 @@ public class TokenStream
         }
     }
 
+    //NEEDS ASSIGNABLE
     //EECE310_TODO: Write requires and assignable specs
-    //@ signals_only RuntimeException, IndexOutOfBoundsException, ArrayStoreException, NullPointerException, IOException; 
+    /*@ requires sourceBuffer != null && sourceReader != null;
+ 		
+    	ensures (\result == true) || (\result == false);
+ 		signals_only RuntimeException, IndexOutOfBoundsException, ArrayStoreException, NullPointerException, IOException;
+	@*/
     private boolean fillSourceBuffer() throws IOException
     {
         if (sourceString != null) Kit.codeBug();
@@ -834,6 +841,10 @@ public class TokenStream
      * Return tokenEnd - tokenBeg
      */
     //EECE310_TODO: Write requires, assignable, and ensures specs
+    /*@ requires tokenEnd > tokenBeg;
+ 		ensures \result == tokenEnd - tokenBeg &&
+ 				\result > 0;
+	@*/       
     public int getTokenLength() {
         return tokenEnd - tokenBeg;
     }
