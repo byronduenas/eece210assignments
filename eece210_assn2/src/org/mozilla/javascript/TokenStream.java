@@ -779,13 +779,11 @@ public class TokenStream
         }
     }
 
-    //NEEDS ASSIGNABLE
-    //EECE310_TODO: Write requires and assignable specs
+    //Note: The assignable clause causes the exceptions thrown in Kit.codeBug() and sourceReader.read(..) to cause warnings
     /*@ requires sourceBuffer != null && sourceReader != null;
- 		
-    	ensures (\result == true) || (\result == false);
- 		signals_only RuntimeException, IndexOutOfBoundsException, ArrayStoreException, NullPointerException, IOException;
+		assignable sourceEnd, sourceCursor, lineStart, sourceBuffer;	
 	@*/
+    //@ signals_only RuntimeException, IndexOutOfBoundsException, ArrayStoreException, NullPointerException, IOException;
     private boolean fillSourceBuffer() throws IOException
     {
         if (sourceString != null) Kit.codeBug();
