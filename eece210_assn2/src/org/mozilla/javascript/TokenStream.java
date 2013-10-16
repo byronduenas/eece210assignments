@@ -693,6 +693,7 @@ public class TokenStream
     /*@ requires ungetBuffer != null;
         assignable cursor, ungetBuffer[*], ungetCursor;
      	ensures ungetBuffer[\old(ungetCursor)] == c &&
+     			ungetCursor == \old(ungetCursor) + 1 &&
      			cursor == \old(cursor-1);
     @*/    
     private void ungetCharIgnoreLineEnd(int c)
