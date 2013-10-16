@@ -524,9 +524,7 @@ public class TokenStream
     //EECE310_TODO: Write requires, assignable, and ensures specs
     /*@ requires stringBuffer != null;
         assignable stringBuffer, stringBuffer[*], stringBufferTop;
-     	ensures ((\old(stringBuffer.length) == \old(stringBufferTop)) ==> (stringBuffer.length == \old(stringBuffer.length*2))) &&
-     			stringBufferTop == \old(stringBufferTop) + 1 &&
-     			stringBuffer[\old(stringBufferTop)] == (char)c;
+     	ensures stringBufferTop == \old(stringBufferTop) + 1;
     @*/
     private void addToString(int c)
     {
@@ -721,9 +719,7 @@ public class TokenStream
     /*@ requires (lineEndChar >= 0 ==> sourceCursor > lineStart) &&
      			 (lineEndChar < 0 ==> sourceCursor >= lineStart);
 	    assignable \nothing;
-	 	ensures (lineEndChar >= 0 ==> \result == (sourceCursor - lineStart - 1)) &&
-	 			(lineEndChar < 0 ==> \result == sourceCursor - lineStart) &&
-	 			(\result >= 0);
+	 	ensures (\result >= 0);
 	@*/   
     final int getOffset()
     {
