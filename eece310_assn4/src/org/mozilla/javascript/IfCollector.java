@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.locks.*;
 
+//import org.mozilla.javascript.IfCollectorSequential.CollectIfs;
 import org.mozilla.javascript.ast.*;
 
 public class IfCollector {
@@ -16,6 +17,9 @@ public class IfCollector {
 	private static AssnData[] assn_data = new AssnData[500];
 	private static int assnData_counter = -1;
 	private static int assnData_ID_counter = 0;
+	
+	private static Object assnCounter_lock = new Object();
+	private static Object ifCounter_lock = new Object();
 	
 	/*EECE310_NOTE: 
 	 * This variable is used to keep track of the number of threads.
@@ -48,6 +52,11 @@ public class IfCollector {
 			long endTime;
 			
 			IfCollector ifc = new IfCollector();
+			for (Node kid : root) {
+				new Thread(ifc.new CollectIfsHelper((FunctionNode)kid, 1, ifc)).run();
+			}
+			
+			
 			/*EECE310_TODO: Visit each child of root (each of 
 			 * which is assumed to be a FunctionNode) and collect 
 			 * "if" and "assignment" data. Use concurrency to gain 
@@ -111,6 +120,23 @@ public class IfCollector {
 		public boolean visit(AstNode node) {
 			if (node instanceof IfStatement) {
 				IfStatement if_st = (IfStatement)node;
+
+				//Get the condition and function name
+				String condition = if_st.getCondition().toSource();
+				String functionName = if_st.getEnclosingFunction().getName();
+				String ifID;
+				
+				//Assign an ID to the function
+				synchronized (ifCounter_lock) {
+					ifData_ID_counter = Tag.newTag(ifData_ID_counter);
+					ifID = "if_" + ifData_ID_counter;
+					
+					//Add this to if_data
+					ifData_counter++;
+					if_data[ifData_counter].functionName = functionName;
+					if_data[ifData_counter].ifCondition = condition;
+					if_data[ifData_counter].ifName = ifID;
+				}
 				
 				/*EECE310_TODO: Record the function name and condition
 				 * of the IfStatement node, and create a name for this
@@ -129,19 +155,24 @@ public class IfCollector {
 			else if (node instanceof Assignment) {
 				Assignment assn_st = (Assignment)node;
 				
-				/*EECE310_TODO: Record the function name, the right hand side
-				 * and the left hand side of the Assignment node, and create 
-				 * a name for this node using the Tag.newTag() function (you
-				 * MUST use this function to generate the tag). See
-				 * IfCollectorSequential.java to give you an idea on how
-				 * to do this. In particular, a tag MUST be generated using the
-				 * following line of code:
-				 * 
-				 * assnData_ID_counter = Tag.newTag(assnData_ID_counter);
-				 * 
-				 * Make sure you perform synchronization when accessing
-				 * a shared variable.
-				 */
+				//Get the left expression, right expression, and function name
+				String leftExpr = assn_st.getLeft().toSource();
+				String rightExpr = assn_st.getRight().toSource();
+				String functionName = assn_st.getEnclosingFunction().getName();
+				String assnID;
+				
+				//Assign an ID to the assignment
+				synchronized (assnCounter_lock) {
+					assnData_ID_counter = Tag.newTag(assnData_ID_counter);
+					assnID = "assn_" + assnData_ID_counter;
+					
+					//Add this to assn_data
+					assnData_counter++;
+					assn_data[assnData_counter].functionName = functionName;
+					assn_data[assnData_counter].assnLeft = leftExpr;
+					assn_data[assnData_counter].assnRight = rightExpr;
+					assn_data[assnData_counter].assnName = assnID;
+				}
 			}
 			
 			//Visit the child nodes
