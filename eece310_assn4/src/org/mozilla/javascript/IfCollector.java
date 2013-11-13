@@ -21,6 +21,8 @@ public class IfCollector {
 	private static Object ifCounter_lock = new Object();
     private static Object assnCounter_lock_ID = new Object();
     private static Object ifCounter_lock_ID = new Object();
+    
+    private static Object threadCounter_lock = new Object();
 
 
 	/*EECE310_NOTE:
@@ -131,16 +133,25 @@ public class IfCollector {
 				String ifID;
 
 				//Assign an ID to the function
-				synchronized (ifCounter_lock) {
-					ifData_ID_counter = Tag.newTag(ifData_ID_counter);
-					ifID = "if_" + ifData_ID_counter;
-
-					//Add this to if_data
-					ifData_counter++;
-					if_data[ifData_counter].functionName = functionName;
-					if_data[ifData_counter].ifCondition = condition;
-					if_data[ifData_counter].ifName = ifID;
+				int temp1;
+				synchronized (ifCounter_lock_ID) {
+					temp1 = Tag.newTag(ifData_ID_counter);
+					ifData_ID_counter = temp1;
 				}
+				
+				ifID = "if_" + temp1;
+				
+				int temp2;
+				
+				synchronized (ifCounter_lock_ID) {
+					//Add this to if_data
+					temp2 = ++ifData_counter;
+				}
+				
+				if_data[temp2].functionName = functionName;
+				if_data[temp2].ifCondition = condition;
+				if_data[temp2].ifName = ifID;
+
 
 				/*EECE310_TODO: Record the function name and condition
 				 * of the IfStatement node, and create a name for this
@@ -207,9 +218,15 @@ public class IfCollector {
 		@Override
 		public void run() {
 			for (int i = 0; i < numFuncs; i++) {
-				thread_counter++;
+				
+				synchronized (threadCounter_lock) {
+					thread_counter++;
+				}
 				(ifc.new CollectIfs(fn)).run();
-				thread_counter--;
+				fn = (FunctionNode)fn.getNext();
+				synchronized (threadCounter_lock) {
+					thread_counter--;
+				}
 			}
 		}
 	}
