@@ -195,10 +195,7 @@ public class AstRoot extends ScriptNode implements Cloneable {
      */
     
     public Iterator astIterator_depth() {
-    	/*EECE310_TODO:
-    	 * Return the generator
-    	 */
-    	return new AstNodeGenerator_Depth(this); //EECE310_TODO: Delete this line once you've implemented this function
+    	return new AstNodeGenerator_Depth(this);
     }
     
     public class AstNodeComparator implements Comparator<AstNode> {
@@ -217,22 +214,10 @@ public class AstRoot extends ScriptNode implements Cloneable {
     	private AstRoot astRt; //the root of the AST we're iterating over
     	private AstNode next; //the next AstNode in the iterator
     	private LinkedList<AstNode> unsortedList, sortedList;
-    	/*EECE310_TODO:
-    	 * Declare whatever extra member variables you want to include here, if any
-    	 */
-    	
-    	/*EECE310_TODO:
-    	 * Define whatever extra functions/methods you want to include here, if any
-    	 */
     	
     	public AstNodeGenerator_Depth(AstRoot rt) {
     		this.astRt = rt;
     		next = (AstNode)astRt;
-    		
-    		/*EECE310_TODO:
-    		 * You may add extra code in this constructor if you wish,
-    		 * but do NOT modify the first two lines
-    		 */
     		
     		sortedList = new LinkedList<AstNode>();
     		unsortedList = new LinkedList<AstNode>();
@@ -255,10 +240,6 @@ public class AstRoot extends ScriptNode implements Cloneable {
     	
 		@Override
 		public boolean hasNext() {
-			/*EECE310_TODO
-			 * Implement this method, which returns true if the iterator still
-			 * has elements to retrieve
-			 */
 			return !sortedList.isEmpty();
 		}
 		
@@ -269,21 +250,10 @@ public class AstRoot extends ScriptNode implements Cloneable {
 		
 		@Override
 		public Object next() throws NoSuchElementException {
-			/*EECE310_TODO
-			 * Return the next AST node. Make sure you
-			 * update the member variable "next" appropriately. Also,
-			 * you should throw a NoSuchElementException if there is
-			 * no next element.
-			 */
 			if(!hasNext()) throw new NoSuchElementException("AstRoot.astIterator_depth");
 			
 			return sortedList.removeFirst();
 		}
-		
-		/*EECE310_TODO:
-		 * Define whatever extra private classes you may wish to
-		 * include here, if any (e.g., comparators, node visitors, etc.)
-		 */
 		
 		@Override
 		public boolean visit(AstNode node) {
