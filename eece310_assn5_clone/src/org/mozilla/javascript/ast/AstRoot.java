@@ -39,6 +39,7 @@
 package org.mozilla.javascript.ast;
 
 import org.mozilla.javascript.Node;
+import org.mozilla.javascript.Tag;
 import org.mozilla.javascript.Token;
 
 import java.util.*;
@@ -197,15 +198,25 @@ public class AstRoot extends ScriptNode implements Cloneable {
     	/*EECE310_TODO:
     	 * Return the generator
     	 */
-    	return null; //EECE310_TODO: Delete this line once you've implemented this function
+    	return new AstNodeGenerator_Depth(this); //EECE310_TODO: Delete this line once you've implemented this function
+    }
+    
+    public class AstNodeComparator implements Comparator<AstNode> {
+    	  public int compare(AstNode node1, AstNode node2) {
+    	    if (node1.depth() == node2.depth()) {
+    	      return 1;
+    	    } else {
+    	      return node1.depth() < node2.depth() ? -1 : 1;
+    	  }
+    	}
     }
     
     //This generator sets up an iterator that iterates over every node in the AST in
     //order of depth
-    private class AstNodeGenerator_Depth implements Iterator {
+    private class AstNodeGenerator_Depth implements NodeVisitor, Iterator {
     	private AstRoot astRt; //the root of the AST we're iterating over
     	private AstNode next; //the next AstNode in the iterator
-    	
+    	private LinkedList<AstNode> unsortedList, sortedList;
     	/*EECE310_TODO:
     	 * Declare whatever extra member variables you want to include here, if any
     	 */
@@ -222,6 +233,24 @@ public class AstRoot extends ScriptNode implements Cloneable {
     		 * You may add extra code in this constructor if you wish,
     		 * but do NOT modify the first two lines
     		 */
+    		
+    		sortedList = new LinkedList<AstNode>();
+    		unsortedList = new LinkedList<AstNode>();
+    		
+    		//visit all the nodes
+    		rt.visit(this);
+    		
+    		List<AstNode> nodes = new ArrayList<AstNode>();
+    		for (AstNode node : unsortedList) {
+    			nodes.add(node);
+    		}
+    		
+    		SortedSet<AstNode> set1 = new TreeSet<AstNode>(new AstNodeComparator());
+    		set1.addAll(nodes);
+    		for (AstNode node: set1) {
+    			//System.out.printf("node.depth() %d\n", node.depth()); 
+    			sortedList.add(node);
+    		}
     	}
     	
 		@Override
@@ -230,7 +259,7 @@ public class AstRoot extends ScriptNode implements Cloneable {
 			 * Implement this method, which returns true if the iterator still
 			 * has elements to retrieve
 			 */
-			return false; //EECE310_TODO: Delete this line once you've implemented this function
+			return !sortedList.isEmpty();
 		}
 		
 		@Override
@@ -246,12 +275,20 @@ public class AstRoot extends ScriptNode implements Cloneable {
 			 * you should throw a NoSuchElementException if there is
 			 * no next element.
 			 */
-			return null; //EECE310_TODO: Delete this line once you've fully implemented this function
+			if(!hasNext()) throw new NoSuchElementException("AstRoot.astIterator_depth");
+			
+			return sortedList.removeFirst();
 		}
 		
 		/*EECE310_TODO:
 		 * Define whatever extra private classes you may wish to
 		 * include here, if any (e.g., comparators, node visitors, etc.)
 		 */
+		
+		@Override
+		public boolean visit(AstNode node) {
+			unsortedList.add(node);
+			return true;
+		}
     }
 }
