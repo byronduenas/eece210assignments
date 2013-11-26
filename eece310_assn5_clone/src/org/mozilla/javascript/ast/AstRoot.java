@@ -107,11 +107,11 @@ public class AstRoot extends ScriptNode implements Cloneable {
         comments.add(comment);
         comment.setParent(this);
     }
-    
+
     public void setInStrictMode(boolean inStrictMode) {
         this.inStrictMode = inStrictMode;
     }
-    
+
     public boolean isInStrictMode() {
         return inStrictMode;
     }
@@ -181,23 +181,23 @@ public class AstRoot extends ScriptNode implements Cloneable {
             }
         });
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
     	AstRoot newNode = new AstRoot(this.position);
     	newNode.setParent(this.parent);
     	return newNode;
     }
-    
+
     /*EECE310_NOTE: You should only modify code BELOW this point (unless
      * you have any extra imports to make, in which case you should add the
      * corresponding import line near the top of this file)
      */
-    
+
     public Iterator astIterator_depth() {
     	return new AstNodeGenerator_Depth(this);
     }
-    
+
     public class AstNodeComparator implements Comparator<AstNode> {
     	  public int compare(AstNode node1, AstNode node2) {
     	    if (node1.depth() == node2.depth()) {
@@ -207,54 +207,54 @@ public class AstRoot extends ScriptNode implements Cloneable {
     	  }
     	}
     }
-    
+
     //This generator sets up an iterator that iterates over every node in the AST in
     //order of depth
     private class AstNodeGenerator_Depth implements NodeVisitor, Iterator {
     	private AstRoot astRt; //the root of the AST we're iterating over
     	private AstNode next; //the next AstNode in the iterator
     	private LinkedList<AstNode> unsortedList, sortedList;
-    	
+
     	public AstNodeGenerator_Depth(AstRoot rt) {
     		this.astRt = rt;
     		next = (AstNode)astRt;
-    		
+
     		sortedList = new LinkedList<AstNode>();
     		unsortedList = new LinkedList<AstNode>();
-    		
+
     		//visit all the nodes
     		rt.visit(this);
-    		
+
     		List<AstNode> nodes = new ArrayList<AstNode>();
     		for (AstNode node : unsortedList) {
     			nodes.add(node);
     		}
-    		
+
     		SortedSet<AstNode> set1 = new TreeSet<AstNode>(new AstNodeComparator());
     		set1.addAll(nodes);
     		for (AstNode node: set1) {
-    			//System.out.printf("node.depth() %d\n", node.depth()); 
+    			//System.out.printf("node.depth() %d\n", node.depth());
     			sortedList.add(node);
     		}
     	}
-    	
+
 		@Override
 		public boolean hasNext() {
 			return !sortedList.isEmpty();
 		}
-		
+
 		@Override
 		public void remove() {
 			//We won't implement this
 		}
-		
+
 		@Override
 		public Object next() throws NoSuchElementException {
 			if(!hasNext()) throw new NoSuchElementException("AstRoot.astIterator_depth");
-			
+
 			return sortedList.removeFirst();
 		}
-		
+
 		@Override
 		public boolean visit(AstNode node) {
 			unsortedList.add(node);
